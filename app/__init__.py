@@ -6,6 +6,7 @@ from flask_migrate import Migrate
 from custom_decorators.status_constants import HttpStatusCode
 from custom_decorators.response import Response
 
+
 db = SQLAlchemy()
 
 
@@ -34,11 +35,18 @@ def create_app(env=None):
     def Work():
         return Response.success({"status": "Running"}, HttpStatusCode.CREATED, "Successfully working")
 
-    @api.errorhandler(TypeError)
-    def handle_type_error_exception(error):
-        return Response.error(
-            {"exception": str(error)},
-            HttpStatusCode.BAD_REQUEST,
-            str(error),
-        )
+    from .custom_exception_handlers import register_error_handlers
+    register_error_handlers(api)
+
+    from .exception import register_error_handlers
+    register_error_handlers(api)
+
+    # @api.errorhandler(TypeError)
+    # def handle_type_error_exception(error):
+    #     return Response.error(
+    #         {"exception": str(error)},
+    #         HttpStatusCode.BAD_REQUEST,
+    #         str(error),
+    #     )
+
     return app
